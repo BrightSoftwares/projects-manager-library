@@ -1,0 +1,108 @@
+<h1><?= stats.typeReport ?> Report</h1>
+<p><?= stats.strBeginDate ?> - <?= stats.strEndDate ?></p>
+<p style="color:grey;">Note : the request gave <?= stats.nbrOfConversations ?> results.</p>
+<h2>Summary</h2>
+<table style="border-spacing:5px;">
+  <tr style="margin-bottom:10px;">
+    <td>
+      <div style="padding:10px;background-color:#000000;">
+        <p style="color:white;"><b><?= stats.nbrOfConversations ?> total activities</b></p>
+      </div>
+    </td>
+    <td>
+      <b><?= Object.keys(stats.recipients).length ?></b> topics. <br/>
+      <b><?= ((stats.nbrOfConversationsInInbox/stats.nbrOfConversations)*100).toFixed(2) ?>%</b> are new.<br/>
+      <b><?= ((stats.nbrOfConversationsStarred/stats.nbrOfConversations)*100).toFixed(2) ?>%</b> were set to in progress (important).<br/>
+      <!--<b><?= stats.nbrOfConversationsStarred ?></b> have been set to in progress<br/>-->
+      <b><?= ((stats.nbrOfConversationsStarted/stats.nbrOfConversations)*100).toFixed(2) ?>%</b> of them are in progress.<br/>
+      and <b><?= ((stats.nbrOfMessagesReceived/stats.nbrOfConversations)*100).toFixed(2) ?>%</b> are closed.
+    </td>
+  </tr>
+  <tr style="margin-bottom:10px;">
+    <td>
+      <div style="padding:10px;background-color:#f1481f;">
+        <p style="color:white;"><b><?= stats.nbrOfConversationsInInbox ?> new activities</b></p>
+      </div>
+    </td>
+    <td>
+      to <b><?= Object.keys(stats.recipients).length ?></b> topics
+    </td>
+  </tr>
+  <tr style="margin-bottom:10px;">
+    <td>
+      <div style="padding:10px;background-color:#009754;">
+        <p style="color:white;"><b><?= stats.nbrOfMessagesReceived ?> activities closed</b></p>
+      </div>
+    </td>
+    <td>
+      created in <b><?= Object.keys(stats.senders).length ?></b> topics<br/>
+      <b><?= ((stats.nbrOfMessagesSentToMe/stats.nbrOfMessagesReceived)*100).toFixed(2) ?>%</b> were closed
+    </td>
+  </tr>
+  <tr style="margin-bottom:10px;">
+    <td>
+      <div style="padding:10px;background-color:#5FB5D8;">
+        <p style="color:white;"><b><?= stats.nbrOfConversationsStarred ?> activities are in progress</b></p>
+      </div>
+    </td>
+    <td>
+      to <b><?= Object.keys(stats.recipients).length ?></b> topics
+    </td>
+  </tr>
+</table>
+<h2>Top open and closed topics <?= stats.strBeginDate ?> - <?= stats.strEndDate ?></h2>
+<table>
+  <tr>
+    <td>
+      Top 15 <b>opened</b> topics :
+      <ul>
+        <? for(var i = 0; i < sortedSenders.length && i < 15; i++) { ?>
+          <li><?= sortedSenders[i][0] ?>&nbsp;<span>(<?= sortedSenders[i][1] ?>)</span></li>
+        <? } ?>
+      </ul>
+    </td>
+    <td>
+      Top 15 <b>pending</b> topics :
+      <ul>
+        <? for(var i = 0; i < sortedPendings.length && i < 15; i++) { ?>
+          <li><?= sortedPendings[i][0] ?>&nbsp;<span>(<?= sortedPendings[i][1] ?>)</span></li>
+        <? } ?>
+      </ul>
+    </td>
+    <td>
+      Top 15 <b>closed</b> topics :
+      <ul>
+        <? for(var i = 0; i < sortedRecipients.length && i < 15; i++) { ?>
+          <li><?= sortedRecipients[i][0] ?>&nbsp;<span>(<?= sortedRecipients[i][1] ?>)</span></li>
+        <? } ?>
+      </ul>
+    </td>
+  </tr>
+</table>
+<h2>Daily traffic</h2>
+<p style="color:grey;">This chart shows the amount of activities opened and closed by hours of the day.</p>
+<img src="cid:dailytraffic"/>
+<h2>Weekly traffic</h2>
+<img src="cid:weeklytraffic"/>
+<h2>Monthly traffic</h2>
+<img src="cid:monthlytraffic"/>
+<h2>Burn up chart</h2>
+<img src="cid:burnupchart"/>
+<h2>Workload chart</h2>
+<img src="cid:workloadchart"/>
+<h2>Backlog evolution</h2>
+<img src="cid:backlogevolution"/>
+<h2>Activity per type</h2>
+<img src="cid:activitypertype"/>
+<h2>Activity per type (stacked)</h2>
+<img src="cid:activitypertypestacked"/>
+<h2>Activity per status</h2>
+<img src="cid:labelized"/>
+<h2>Gantt</h2>
+<img src="cid:projectgantt"/>
+<h2>Attachment</h2>
+<img src="cid:attachments"/>
+<h2>Subject word count</h2>
+<img src="cid:messageslength" />
+<h2>Response time</h2>
+<img src="cid:responsetime"/>

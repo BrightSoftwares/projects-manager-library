@@ -1,0 +1,135 @@
+<h1>Project report - <?= reportTitle ?></h1>
+<p style="color:#404040;">Project report automatically generated. This is still a test.</p>
+
+<h2>Récapitulatif</h2>
+
+<p style="color:#404040;">
+<i>* Bleu : done, Rouge : in progress, Orange : todo, Vert : blocking points</i><br/>
+<i>** windy <?!= meteo.windy ?>, stormy <?!= meteo.stormy ?>, sunny <?!= meteo.sunny ?>, blast <?!= meteo.blast ?></i><br/>
+<i>*** #done / #in progress / #todo / #blocking points</i>
+</p>
+
+<table style="border-spacing:5px;">
+  <thead style="color: white; background: black;"><tr>
+    <th>Nom du projet</th>
+    <th>Graphique *</th>
+    <th>Météo **</th>
+    <th>Métriques ***</th>
+    <? if(displaydates) { ?> 
+     <th>Date de debut</th>
+     <th>Date de fin</th>
+    <? } ?>
+    <th>Statut</th>
+  </tr></thead>
+<? 
+    
+    for(var i=0; i<projects.length; i++) {
+         project = projects[i];
+  ?>
+  <tr style="margin-bottom:10px; border: 1px solid #404040;">
+    <td><div style="padding:3px;"><?= projects[i].project_name ?></div></td>
+    <td><div style="padding:3px;"><img src="cid:<?= "chart"+i ?>"/></div></td>
+    <td><div style="padding:3px; font-size:35px"><?!= projects[i].weather == undefined ? "": meteo[projects[i].weather.toLowerCase()] ?></div></td>
+    <td><div style="padding:3px;">
+          <?= projects[i].done == undefined ? "" : projects[i].done.length ?> / 
+          <?= projects[i].in_progress == undefined ? "" : projects[i].in_progress.length ?> / 
+          <?= projects[i].todo == undefined ? "" : projects[i].todo.length ?> / 
+          <?= projects[i].blocking_points == undefined ? "": projects[i].blocking_points.length ?>
+        </div>
+    </td>
+    <? if(displaydates) { ?> 
+     <td><div style="padding:3px;"><?= projects[i].start_date ?></div></td>
+     <td><div style="padding:3px;"><?= projects[i].end_date ?></div></td>
+    <? } ?>
+     <td><div style="padding:3px;"><?= projects[i].status ?></div></td>
+  </tr>
+  <? } ?>
+</table>
+
+<h2>Détail du suivi des projets</h2>
+
+<? for(var i=0; i<projects.length; i++) {
+         project = projects[i];
+         
+     if(projects[i].status != "Delivered")
+     {
+  ?>
+<h3><?= project.project_name ?> <? if(displaydates) { ?> <span style="color:grey; font-size:12px;"><?= project.start_date ?> - <?= project.end_date ?></span> <? } ?></h3>
+<table style="border-spacing:0px;">
+  <tr style="margin-bottom:0px;">
+    <td>
+      <p style="margin:5px 0px;color:#404040;"><strong><u>Reste à faire :</u></strong></p>
+      <div style="padding:3px;background-color:#ffffff;">
+        <div style="color:#404040;">
+           <? for (var l = 0; l<project.todo.length; l++) { ?>
+              <? if(project.todo[l].trim() != "") { ?>
+                <? if(project.todo[l].trim().substring(0,1) == "#") { ?> 
+                     <div style="font-weight: bolder; font-style: italic; margin: 5px 0px;"><?= project.todo[l].trim() ?></div>                 
+                <? } else { ?>
+                     <div>* <?= project.todo[l] ?></div>
+                <? } ?>
+              <? } ?>
+           <? } ?>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr style="margin-bottom:0px;">
+    <td>
+      <p style="margin:5px 0px;color:#404040;"><strong><u>En cours :</u></strong></p>
+      <div style="padding:3px;background-color:#ffffff;">
+        <div style="color:#404040;">
+           <? for (var k = 0; k<project.in_progress.length; k++) { ?>
+              <? if(project.in_progress[k].trim() != "") { ?>
+                <? if(project.in_progress[k].trim().substring(0,1) == "#") { ?> 
+                     <div style="font-weight: bolder; font-style: italic; margin: 5px 0px;"><?= project.in_progress[k].trim() ?></div>                 
+                <? } else { ?>
+                     <div>* <?= project.in_progress[k] ?></div>
+                <? } ?>
+              <? } ?>
+           <? } ?>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr style="margin-bottom:0px;">
+    <td>
+      <p style="margin:5px 0px;color:#404040;"><strong><u>Points d'attention/bloquants :</u></strong></p>
+      <div style="padding:3px;background-color:#ffffff;">
+        <div style="color:#404040;">
+           <? for (var m = 0; m<project.blocking_points.length; m++) { ?>
+              <? if(project.blocking_points[m].trim() != "") { ?>
+                <? if(project.blocking_points[m].trim().substring(0,1) == "#") { ?> 
+                     <div style="font-weight: bolder; font-style: italic; margin: 5px 0px;"><?= project.blocking_points[m].trim() ?></div>                 
+                <? } else { ?>
+                     <div>* <?= project.blocking_points[m] ?></div>
+                <? } ?>
+              <? } ?>
+           <? } ?>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <tr style="margin-bottom:0px;">
+    <td>
+      <p style="margin:5px 0px;color:#404040;"><strong><u>Fait ces 2 dernières semaines:</u></strong></p>
+      <div style="padding:3px;background-color:#ffffff;">
+        <div style="color:#404040;">
+           <? for (var j = 0; j<project.recently_done.length; j++) { ?>
+              <? if(project.recently_done[j].trim() != "") { ?>
+                <? if(project.recently_done[j].trim().substring(0,1) == "#") { ?> 
+                     <div style="font-weight: bolder; font-style: italic; margin: 5px 0px;"><?= project.recently_done[j].trim() ?></div>                 
+                <? } else { ?>
+                     <div>* <?= project.recently_done[j] ?></div>
+                <? } ?>
+              <? } ?>
+           <? } ?>
+        </div>
+      </div>
+    </td>
+  </tr>
+</table>
+<?    } //end if
+
+   } // end for
+?>

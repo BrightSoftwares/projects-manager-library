@@ -1,0 +1,411 @@
+<!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css">
+
+<style>
+boby { font-size: 1em; }
+#launchPad {
+    float:left;
+    border: 1px solid #eaeaea;
+    background-color: #f5f5f5;
+}
+#dropZone {
+    float:right;
+    border: 1px solid #eaeaea;
+    background-color: #ffffcc;
+}
+.card2 { 
+    width: 150px; 
+    padding: 5px 10px;
+    margin:5px;
+    border:1px solid #ccc;
+    background-color: #eaeaea;
+}
+.stack2 {
+    width: 180px;
+    border: 1px solid #ccc;
+    background-color: #f5f5f5;
+    margin: 20px;
+}
+.stackHdr {
+    background-color: #eaeaea;
+    border: 1px solid #fff;
+    padding: 5px 
+}
+.stackDrop1, .stackDrop2 {
+    min-height:100px;
+    padding: 15px;
+}
+
+.stackDrop, .stackDrop3, .stackDrop4 {
+    min-height:100px;
+    padding: 15px;
+}
+
+.projectActivities {
+    padding: 10px;
+}
+
+.projectActivitiesItem {
+    margin: 10px;
+    border-bottom: 1px solid #c0c0c0;
+    padding: 3px;
+}
+
+.projectActivitiesSection
+{
+    height: 500px;
+    overflow: scroll;
+}
+
+.collapse { border: 1px dotted cyan; }
+.collapse .in { border: 3px dotted blue; }
+.collapsing { color: green; }
+
+.dropzone { height: 250px; overflow: auto; }
+.dropzone .todolist-item { font-size: 0.8em; }
+.dropzone .todolist-item .email-reference, .dropzone .todolist-item .status { display: none; }
+.ui-draggable-helper { width: 200px; height: 100px; overflow: hidden; border: 1px dotted grey; }
+.ui-state-default { border: 3px dotted blue; }
+.ui-state-hover .stackDrop { border: 5px dotted cyan; }
+
+</style>
+
+<span class="btn-group" role="group" aria-label="...">
+  <button type="button" class="btn btn-default" onclick="refreshList()">Refresh from DB</button>
+  <button type="button" class="btn btn-default" onclick="updatePrioritiesOnUI()">Update priorities</button>
+  <button type="button" class="btn btn-default" onclick="updatePrioritiesOnSpreadsheet()">Push to DB</button>
+</span>  
+
+<div class="column-sm-12">
+  <h1>Projects List</h1>  
+  <div class="card-columns" id="projectslist">
+     Loading ...
+  </div>
+</div>  
+
+<h1>Activity tracker Priority TODO List</h1>
+
+<div class="container">
+<div class="row">
+
+  <div class="col-sm-7">
+      <div class="col-sm-6">
+          <div class="card dropzone">
+              <div class="card-header">Urgent and important</div><div class="stackDrop card-block"></div>
+          </div>
+      </div>
+      
+      <div class="col-sm-6">
+          <div class="card dropzone">
+              <div class="card-header">Urgent and not important</div><div class="stackDrop card-block"></div>
+          </div>
+      </div>
+      <div class="col-sm-6">
+          <div class="card dropzone">
+              <div class="card-header">Not urgent and Important</div><div class="stackDrop card-block"></div>
+          </div>
+      </div>
+      <div class="col-sm-6">
+          <div class="card dropzone">
+              <div class="card-header">Not urgent and Not important</div><div class="stackDrop card-block"></div>
+          </div>
+      </div>
+  </div>
+  <div class="col-sm-5 projectActivitiesSection">
+    <!--<h1>Project activities List</h1>-->
+    <div id="filters" class="clearfix" id="projectsActivitiesList" role="tablist" aria-multiselectable="true">
+    </div>
+    <div class="projectActivities">
+      Loading ...
+    </div>
+    </div>
+  </div>
+</div>
+
+
+<h2>An old table to delete I think ...</h2>
+  <table style="border-spacing:5px;">
+    <tr style="">
+      <td>
+           
+      </td>
+    </tr>
+    <tr style="margin-bottom:10px;">
+      <td>
+        <ul id="activities" class="list-group" style="margin: 20px 0px;">
+          <li>Loading...</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+  
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script scr="//cdnjs.cloudflare.com/ajax/libs/mixitup/2.1.11/jquery.mixitup.min.js"></script>
+
+<script>
+// The code in this function runs when the page is loaded.
+$(function() { 
+    refreshList(); 
+});
+
+function updatePrioritiesOnSpreadsheet()
+{
+  // for each item, update the spreadsheet's priority
+  $('#activities li').each(function(){
+        var priority = $(this).children( ".priority" ).text();
+        var email_reference = $(this).children( ".email-reference" ).text();
+        var status = $(this).children( ".status" ).text();
+        $(this).children( ".status" ).text("Processing ...");
+        google.script.run
+              .withSuccessHandler(function() { $(this).children( ".status" ).text("Done"); } )
+              .withFailureHandler(function() { $(this).children( ".status" ).text("Failed"); } )
+              .updateActivityPriority(email_reference, priority);
+        
+  });
+  
+  //
+}
+
+function updatePrioritiesOnUI()
+{
+    var priority = 1;
+    $('#activities li').each(function(){
+        $(this).children( ".priority" ).text(priority);
+        priority++;
+    });
+}
+
+function refreshList()
+{
+   //$('#activities').empty().append("<li>Loading...</li>");
+   // Load the activities in progress in my inbox
+   //google.script.run.withSuccessHandler(showTodolist).fetchInProgressActivities();
+   
+   // Load the project tasks list, process only the todo and in progress activities
+   google.script.run.withSuccessHandler(showProjecttaskList).fetchInProgressActivities();
+   
+   // Load the projects
+   //google.script.run.withSuccessHandler(showProjects).fetchInProgressActivitiesStats();
+}
+
+
+function showProjecttaskList(things) {
+  things = jQuery.parseJSON(things);
+  console.log(things);
+  console.log(things.length);
+  
+  var filtering = $('#filters');
+  var projectsList = [];
+  for (var k=0; k < things.length; k++)
+  {
+    var currentslug = slugify(things[k].project_name)
+    if(projectsList.indexOf(things[k].project_name) == -1)
+    {
+      filtering.append('<div id="'+ currentslug +'" class="project-container"><span class="filter" id="project-'+currentslug+'" data-filter=".'+ currentslug +'"><a data-toggle="collapse" aria-expanded="false" data-target="#'+ currentslug +'-elements" aria-controls="'+ currentslug +'-elements" href="#'+ currentslug +'-elements" class="project-header">'+ things[k].project_name +'<span id="project-'+currentslug+'-count" class="tag tag-pill tag-danger">0</span></a></span><div id="'+ currentslug +'-elements" class="collapse project-elements" role="tabpanel" aria-labelledby="project-'+ currentslug +'"></div></div>');
+      //$('#projectslist').append('<a href="#project-'+ currentslug +'"><div id="project-'+ currentslug +'"><span class="filter" data-filter=".'+ currentslug +'">'+ things[k].project_name +'</span><span id="project-'+currentslug+'-count" class="tag tag-pill tag-danger">0</span></div></a>');
+      projectsList.push(things[k].project_name);
+    }
+  }
+  
+  var list = $('#projectsActivitiesList');
+  list.empty();
+  
+  for (var i = 0; i < things.length; i++) 
+  {
+    var myslug = slugify(things[i].project_name);
+    var currentcategory = $('#'+myslug+"-elements");
+    currentcategory.append('<div class="todolist-item projectActivitiesItem" data-cat="'+ things[i].project_name +'">' 
+                 + '<span class="move-area glyphicon glyphicon-move" style="cursor: move;"></span>' 
+                 + '<span class="email-reference tag tag-pill tag-danger">' + things[i].email_reference 
+                 + '</span><span class="priority tag tag-pill tag-primary">' + things[i].priority 
+                 + '</span><span class="status tag tag-pill tag-default">' + things[i].status 
+                 + '</span><span class="project-name tag tag-pill tag-success">' + things[i].project_name 
+                 + '</span> - <span class="comment">' + things[i].comment + '</span>' 
+                 + '</span> - <span class="comment"><a href="https://mail.google.com/mail/u/0/#all/' + things[i].email_link + '" target="_blank"> Email </a></span>'
+                 + '</div>');
+  }
+  
+  $(".project-container").each(function() {
+    // ...
+    var size = $(this).find(".todolist-item").length;
+    $(this).find(".project-header .tag-pill").text(size);
+  });
+  
+  $( ".project-header" ).click(function() {
+    console.log("Click on project elements header");
+    //$( this ).toggleClass( "in" );
+    $(this).parent().siblings( ".project-elements" ).toggleClass("in");
+  });
+    
+  $(".todolist-item").draggable({
+    appendTo: "body",
+    cursor: "move",
+    helper: 'clone',
+    revert: "invalid",
+    start: function(e, ui)
+    {
+      $(ui.helper).addClass("ui-draggable-helper");
+    }
+  });
+  
+  /*$('#projectsActivitiesList').MixItUp({
+      selectors: {
+        target: '.todolist-item',
+        filter: '.filter'
+      }
+  });*/
+  
+  $("#activities").droppable({
+    tolerance: "intersect",
+    accept: ".todolist-item",
+    activeClass: "ui-state-default",
+    hoverClass: "ui-state-hover",
+    drop: function(event, ui) {
+      $("#activities").append($(ui.draggable));
+    }
+  });
+  
+  $(".stackDrop3, .dropzone").droppable({
+    tolerance: "intersect",
+    accept: ".todolist-item",
+    activeClass: "ui-state-default",
+    hoverClass: "ui-state-hover",
+    drop: function(event, ui) {        
+      $(this).append($(ui.draggable));
+    }
+  });
+  
+  $(".stackDrop4").droppable({
+    tolerance: "intersect",
+    accept: ".todolist-item",
+    activeClass: "ui-state-default",
+    hoverClass: "ui-state-hover",
+    drop: function(event, ui) {        
+      $(this).append($(ui.draggable));
+    }
+  });
+}
+
+
+function showTodolist(things) {
+  things = jQuery.parseJSON(things);
+  console.log(things);
+  console.log(things.length);
+  
+  var list = $('#activities');
+  list.empty();
+  
+  for (var i = 0; i < things.length; i++) 
+  {
+    list.append('<li class="todolist-item list-group-item">' 
+                 + '<span class="move-area glyphicon glyphicon-move" style="cursor: move;"></span>' 
+                 + '<span class="email-reference label label-danger">' + things[i].email_reference 
+                 + '</span><span class="priority label label-primary" style="display: none;">' + things[i].priority 
+                 + '</span><span class="status label label-default" style="display: none;">' + things[i].status 
+                 + '</span><span class="project-name" style="display: none;">' + things[i].project_name 
+                 + '</span> - <span class="comment" style="display: none;">' + things[i].comment + '</span>' 
+                 + '</span> - <span class="comment" style="display: none;"><a href="https://mail.google.com/mail/u/0/#all/' + things[i].email_link + '" target="_blank"> Email </a></span>'
+                 + '</li>');
+  }
+  
+  /*$( "#activities" ).sortable({
+      revert: true,
+      stop: function() {
+        updatePrioritiesOnUI();
+      }
+  });
+  
+  $( "ul, li email-reference" ).disableSelection();  
+  */
+  
+  /*$("#activities").height($(window).height() - 20);
+  var dropSpace = $(window).width() - $("#activities").width();
+  $("#dropZone").width(dropSpace - 70);
+  $("#dropZone").height($("#activities").height());
+  */
+  
+  $(".todolist-item").draggable({
+    appendTo: "body",
+    cursor: "move",
+    helper: 'clone',
+    revert: "invalid"
+  });
+  
+  $("#activities").droppable({
+    tolerance: "intersect",
+    accept: ".todolist-item",
+    activeClass: "ui-state-default",
+    hoverClass: "ui-state-hover",
+    drop: function(event, ui) {
+      $("#activities").append($(ui.draggable));
+    }
+  });
+  
+  $(".stackDrop3").droppable({
+    tolerance: "intersect",
+    accept: ".todolist-item",
+    activeClass: "ui-state-default",
+    hoverClass: "ui-state-hover",
+    drop: function(event, ui) {        
+      $(this).append($(ui.draggable));
+    }
+  });
+  
+  $(".stackDrop4").droppable({
+    tolerance: "intersect",
+    accept: ".todolist-item",
+    activeClass: "ui-state-default",
+    hoverClass: "ui-state-hover",
+    drop: function(event, ui) {        
+      $(this).append($(ui.draggable));
+    }
+  });
+}
+
+function showProjects(things) {
+  things = jQuery.parseJSON(things);
+  console.log(things);
+  console.log(things.length);
+  
+  var list = $('#projectslist');
+  list.empty();
+  
+  var i=0;
+  for (var thing in things) {
+    list.append('<div class="card">'
+                + '  <img class="card-img-top img-fluid" src="http://lorempixel.com/318/180/abstract/'+ i +'" alt="'+ things[thing].name +'">'
+                + '  <div class="card-block">'
+                + '    <h4 class="card-title">' + things[thing].name + '</h4>'
+                + '    <p class="card-text">Status: <i>' + things[thing].status + '</i></p>'
+                + '  </div>'
+                + '  <div class="card-block">'
+                + '    <span style="color:green;">' + things[thing].done + ' done</span>'
+                + '    <span style="color:orange;">' + things[thing].in_progress + ' in progress</span>'
+                + '    <span style="color:blue;">' + things[thing].todo + ' todo</span>'
+                + '    <span style="color:red;">' + things[thing].abandonned + ' abandonned</span>'
+                + '  </div>'
+                + '</div>');
+     i++;
+  }
+  
+  $( "#projectslist" ).sortable({
+      revert: true,
+      stop: function() {
+        console.log("A card have been dragged");
+        //updatePrioritiesOnUI();
+      }
+  });
+}
+
+function slugify(text)
+  {
+    return text.toString().toLowerCase()
+      .replace(/\s+/g, '-')           // Replace spaces with -
+      .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+      .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+      .replace(/^-+/, '')             // Trim - from start of text
+      .replace(/-+$/, '');            // Trim - from end of text
+  }
+</script>

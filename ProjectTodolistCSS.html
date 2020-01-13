@@ -1,0 +1,277 @@
+<style type="text/css">
+  
+        /***
+          #F3F4F6 // gray bg
+          #789FE6 // blue bg
+          #FFFFFF // white
+          #F4F5F7 // gray in portlet
+          #3C75DD // blue flag
+          #131A37 // black text
+          #B433AC // magenta flag
+          #5DC560 // green flag
+          #FF183A // violet flag
+          #959CA8 // gray text status
+          #BBBBBB // gray flag
+        ***/
+        form { font-size: 0.8em; }
+        
+        .tilt {
+          transform: rotate(3deg);
+          -moz-transform: rotate(3deg);
+          -webkit-transform: rotate(3deg);
+        }
+
+        body {
+          min-width: 520px;
+          background-color: #F3F4F6;
+          padding: 10px;
+          color: #131A37;
+        }
+        
+        .done { text-decoration: line-through; }
+        .blink { text-decoration: blink; }
+        .loader {
+          border: 3px solid #f3f3f3;
+          border-top: 3px solid blue;
+          border-right: 3px solid green;
+          border-bottom: 3px solid red;
+          border-left: 3px solid pink;
+          border-radius: 50%;
+          width: 13px;
+          height: 13px;
+          display: inline-block;
+          /***position: absolute;
+          top: 7px;
+          right: 27px;**/
+          text-indent: -999px;
+          -webkit-animation: spin 2s linear infinite;
+          animation: spin 2s linear infinite;
+        }
+        
+        .add-task-container { position: fixed; margin-bottom: 30px; background-color: inherit; padding: 10px; z-index: 10; box-shadow: 1px 1px 6px #BBBBBB; }
+        .add-task-container-marge { padding-top: 170px; }
+        .add-task-button :not('.glyphicon-refresh-animate') { display: none; }
+        #show-lastpushedtospreadsheet {font-size: 0.8em; color: #959CA8;}
+        #add-task-taskid { display: none; }
+        
+        @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        .glyphicon-refresh-animate {
+          -animation: spin .7s infinite linear;
+          -webkit-animation: spin2 .7s infinite linear;
+        }
+        
+        @-webkit-keyframes spin2 {
+          from { -webkit-transform: rotate(0deg);}
+          to { -webkit-transform: rotate(360deg);}
+        }
+        
+        /*
+        @keyframes spin {
+          from { transform: scale(1) rotate(0deg);}
+          to { transform: scale(1) rotate(360deg);}
+        }*/
+        
+        .column-done {
+          clear: both;
+          height: 300px;
+          overflow: auto;
+          margin-top: 100px;
+        }
+
+        .column-done .portlet { width: 200px; float: left; }
+        .column {
+          width: 230px;
+          float: left;
+          margin: 0px 10px;
+          background-color: #FFFFFF;
+          box-shadow: 1px 1px 6px #BBBBBB;
+        }
+        .column .column-category, .column-done .column-category{
+          text-align: center;
+          background: lightslategrey;
+          color: white;
+        }
+        
+        .column .column-category i, .column-done .column-category i{ color: lightgray; }
+        .column .column-category strong, .column-done .column-category strong{ color: lightsalmon; }
+        
+        .portlet {
+          margin: 5px;
+          padding: 0.3em;
+          font-size: 0.8em;
+          background-color: #F4F5F7;
+        }
+        /*.portlet .portlet-bottom .btn { font-size: 0.6em; display: none; }*/
+        .portlet-list-review { background-color: #FFFFFF; padding: 20px; }
+        .portlet-list-review .portlet { box-shadow: 1px 1px 6px #BBBBBB; margin-bottom: 10px; }
+        
+        .portlet-list { padding-bottom: 100px; }
+        .portlet-header {
+          padding: 0.2em 0.3em;
+          margin-bottom: 0.5em;
+          position: relative;
+          /*border-bottom: 1px solid #e0e0e0;*/
+          text-align: left;
+          color: #959CA8;
+        }
+        
+        .portlet-bottom .btn-group { margin-top: 10px; }
+        
+        .portlet-status { color: #959CA8; text-transform: uppercase; }
+        
+        .portlet-header:hover { cursor: pointer; cursor: hand; }
+        .portlet-taskduration { /*color: cyan;*/ }
+        .portlet-taskpredecessors { /*color: red;*/ }
+        .portlet-taskid, .portlet-category { display: none; }
+        .portlet-toggle {
+          position: absolute;
+          top: 50%;
+          right: 0;
+          margin-top: -8px;
+        }
+        .portlet-content {
+          padding: 0.4em;
+          overflow-x: hidden;
+        }
+        .portlet-placeholder {
+          border: 1px dotted black;
+          margin: 0 1em 1em 0;
+          height: 50px;
+        }
+        .portlet-markdone { color: green; right: 14px; top: 50%; margin-top: -8px; position: absolute; }
+        .portlet-markabandoned { color: red; right: 28px; top: 50%; margin-top: -8px; position: absolute; }
+        
+        span[class*="tag-intent"], span[class*="tag-action"] { background-color: gray; }
+        span.tag-intent-communicate, span.tag-action-communicate { background-color: darkblue; }
+        span.tag-intent-dosomesupport, span.tag-action-dosomesupport { background-color: orange; }
+        span.tag-intent-coordinateteam, span.tag-action-coordinateteam { background-color: cyan; }
+        span.tag-intent-dosometechaction, span.tag-action-dosometechaction { background-color: red; }
+        span.tag-intent-report, span.tag-action-report, span.tag-intent-hireperson { background-color: magenta; }
+        span.tag-intent-acquireskills, span.tag-action-acquireskills { background-color: green; }
+        span.tag-intent-manageteam, span.tag-action-manageteam { background-color: lightblue; }
+        span.tag { margin: 2px; padding: 2px 5px; border-radius: 5px; color: white; font-size: 0.8em; white-space: nowrap; }
+        span.tag-taskid { background-color: gray; }
+        
+                
+        .tree ul {
+        padding-top: 20px;
+        position: relative;
+        
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        }
+        
+        .tree li {
+        white-space: nowrap;
+        float: left;
+        text-align: center;
+        list-style-type: none;
+        position: relative;
+        padding: 20px 5px 0 5px;
+        
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        }
+        
+        /*We will use ::before and ::after to draw the connectors*/
+        
+        .tree li::before, .tree li::after{
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 50%;
+        border-top: 1px solid #ccc;
+        width: 50%;
+        height: 20px;
+        }
+        .tree li::after{
+        right: auto;
+        left: 50%;
+        border-left: 1px solid #ccc;
+        }
+        
+        /*We need to remove left-right connectors from elements without
+        any siblings*/
+        .tree li:only-child::after, .tree li:only-child::before {
+        display: none;
+        }
+        
+        /*Remove space from the top of single children*/
+        .tree li:only-child{
+        padding-top: 0;
+        }
+        
+        /*Remove left connector from first child and
+        right connector from last child*/
+        .tree li:first-child::before, .tree li:last-child::after{
+        border: 0 none;
+        }
+        /*Adding back the vertical connector to the last nodes*/
+        .tree li:last-child::before{
+        border-right: 1px solid #ccc;
+        border-radius: 0 5px 0 0;
+        -webkit-border-radius: 0 5px 0 0;
+        -moz-border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after{
+        border-radius: 5px 0 0 0;
+        -webkit-border-radius: 5px 0 0 0;
+        -moz-border-radius: 5px 0 0 0;
+        }
+        
+        /*Time to add downward connectors from parents*/
+        .tree ul ul::before{
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        border-left: 1px solid #ccc;
+        width: 0;
+        height: 20px;
+        }
+        
+        .tree li a{
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        text-decoration: none;
+        color: #666;
+        font-family: arial, verdana, tahoma;
+        font-size: 11px;
+        display: inline-block;
+        
+        border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -moz-border-radius: 5px;
+        
+        transition: all 0.5s;
+        -webkit-transition: all 0.5s;
+        -moz-transition: all 0.5s;
+        }
+        
+        /*Time for some hover effects*/
+        /*We will apply the hover effect the the lineage of the element also*/
+        .tree li a:hover, .tree li a:hover+ul li a {
+        background: #c8e4f8;
+        color: #000;
+        border: 1px solid #94a0b4;
+        }
+        /*Connector styles on hover*/
+        .tree li a:hover+ul li::after,
+        .tree li a:hover+ul li::before,
+        .tree li a:hover+ul::before,
+        .tree li a:hover+ul ul::before{
+        border-color:  #94a0b4;
+        }
+        
+        
+</style>

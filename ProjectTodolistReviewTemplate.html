@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css">
+    <?!= include('ProjectTodolistCSS'); ?>
+  </head>
+  <body>
+  
+    <style type="text/css">
+  
+    </style>
+  
+    <button type="button" class="btn btn-primary mb-2 mr-sm-2 mb-sm-0" onclick="refreshProjectTasks()"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>Update project task list</button>
+  
+    <div id="projecttasks-review" class="portlet-list-review"></div>
+    
+    
+    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script scr="//cdnjs.cloudflare.com/ajax/libs/mixitup/2.1.11/jquery.mixitup.min.js"></script>
+    <?!= include('ProjectTodolistJavascript'); ?>
+    
+    <script>
+      function updateProjectTasks(projectTasks)
+      {
+          var projecttasksreview = $('#projecttasks-review');
+          var portletCode = "";
+          
+          for (var i = 0; i < projectTasks.length; i++) 
+            {
+              console.log(projectTasks[i].project_name);
+              var projectName = projectTasks[i].project_name.toString().trim();
+              portletCode = '<div class="portlet portlet-review">\
+                                <div class="portlet-header">\
+                                  <div class="portlet-projectname">' + projectName + '</div>\
+                                  <div class="loader-holder"></div>\
+                                  <span class="portlet-toggle">&#x2796;</span>\
+                                </div>\
+                                <div class="portlet-taskid">' + projectTasks[i].task_id + '</div>\
+                                <div class="portlet-category">' + projectTasks[i].category + '</div>\
+                                <div class="portlet-content">\
+                                  <span class="portlet-tasknumber tag tag-pill tag-default">' +  projectTasks[i].task_number  + '</span>\
+                                  <span class="portlet-status">[' +  projectTasks[i].status  + ']</span>\
+                                  <span class="portlet-description"> ' +  projectTasks[i].task_description  + '</span>\
+                                </div>\
+                                <div class="portlet-middle">\
+                                  <span class="portlet-tags tag tag-pill tag-default">' +  projectTasks[i].category  + '</span>\
+                                  <span class="portlet-tags tag tag-pill tag-default">' +  projectTasks[i].status  + '</span>\
+                                  <span class="portlet-tags tag tag-pill tag-success">&#x23F0; ' +  relativeDate(projectTasks[i].timestamp)  + '</span>\
+                                </div>\
+                                <div class="portlet-bottom">\
+                                  <div class="btn-group btn-group-sm" role="group" aria-label="Button group for categories">\
+                                    <span class="portlet-review-markurgentandimportant btn btn-secondary btn-sm">Urgent and important</span>\
+                                    <span class="portlet-review-markurgentnotimportant btn btn-secondary btn-sm">Urgent not important</span>\
+                                    <span class="portlet-review-marknoturgentimportant btn btn-secondary btn-sm">Not urgent important</span>\
+                                    <span class="portlet-review-marknoturgentnotimportant btn btn-secondary btn-sm">Not urgent not important</span>\
+                                  </div>\
+                                  <div class="btn-group btn-group-sm" role="group" aria-label="Button group for statuses">\
+                                    <span class="portlet-review-marktodo btn btn-outline-primary btn-sm">&#x2714; Todo</span>\
+                                    <span class="portlet-review-markinprogress btn btn-outline-warning btn-sm">&#x2639; In progress</span>\
+                                    <span class="portlet-review-markabandoned btn btn-outline-danger btn-sm">&#x2639; Abandoned</span>\
+                                    <span class="portlet-review-markdone btn btn-outline-success btn-sm">&#x2714; Done</span>\
+                                  </div>\
+                                </div>\
+                             </div>';
+              
+              if(projectTasks[i].status != "done" && projectTasks[i].status != "abandonned" && projectTasks[i].status != "Done" && projectTasks[i].status != "Abandonned") { projecttasksreview.append(portletCode); }
+            }
+            console.log("Finished.");
+        
+            // Activate the javascript controls
+            activateUiControls()
+      }
+      
+      function refreshProjectTasks() 
+      { 
+        console.log("Refreshing project tasks ...");
+        $('#projecttasks-review').empty();
+        google.script.run.withSuccessHandler(updateProjectTasks).retrieveProjectTasksSortedbylastupdated();
+      };
+      
+      // load the project tasks
+      refreshProjectTasks();
+    </script>
+    
+  </body>
+</html>
+
+

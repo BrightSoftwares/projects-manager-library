@@ -1,0 +1,305 @@
+<html>
+  <head>
+    <style>
+      #content {
+        font-family:Arial;
+        width:900px;
+        background-color:#F1F1F1;
+        border:1px solid #E5E5E5;
+        margin-left:auto;
+        margin-right:auto;
+        padding:0px;
+      }
+      #innercontent {
+        padding:10px;
+      }
+      .notifications-area {
+        margin: 20px 0;
+      }
+      /*------------------------------------*\
+      $WRAPPER
+      \*------------------------------------*/
+      .buttons {/* Style as you wish (toolbar) */}
+      
+      /* The Magnificent CLEARFIX */
+      .buttons:before, .buttons:after {
+        content: "\0020"; display: block; height: 0; visibility: hidden;	
+      } 
+      .buttons:after { clear: both; }
+      .buttons { zoom: 1; }
+      /* ------------------------ */
+      
+      
+      /*------------------------------------*\
+      $BUTTON
+      \*------------------------------------*/
+      button, 
+      .button {
+        text-decoration: none;
+        text-shadow: 0 1px 0 #fff;
+        
+        font: bold 11px Helvetica, Arial, sans-serif;
+        color: #444;
+        line-height: 17px;
+        height: 18px;
+        
+        display: inline-block;
+        float: left;
+        
+        margin: 5px;
+        padding: 5px 6px 4px 6px;
+        
+        background: #F3F3F3;
+        border: solid 1px #D9D9D9;
+        
+        border-radius: 2px;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        
+        -webkit-transition: border-color .20s;
+        -moz-transition: border-color .20s;
+        -o-transition: border-color .20s;
+        transition: border-color .20s;
+      }
+      button {
+        height: 29px !important;
+        cursor: pointer;
+      }
+      button:hover, 
+      .button:hover {
+        background: #F4F4F4;
+        border-color: #C0C0C0;
+        color: #333;
+      }
+      
+      button:active, 
+      .button:active {
+        border-color: #4D90FE;
+        color: #4D90FE;
+        
+        -moz-box-shadow:inset 0 0 10px #D4D4D4;
+        -webkit-box-shadow:inset 0 0 10px #D4D4D4;
+        box-shadow:inset 0 0 10px #D4D4D4;
+      }
+      button.red, 
+      .button.red {
+        border: 1px solid #D14836 !important;
+        
+        background: #D64937;
+        background: -webkit-linear-gradient(top, #DC4A38, #D14836);
+        background: -moz-linear-gradient(top, #DC4A38, #D14836);
+        background: -ms-linear-gradient(top, #DC4A38, #D14836);
+        background: -o-linear-gradient(top, #DC4A38, #D14836);
+        
+        -webkit-transition: border .20s;
+        -moz-transition: border .20s;
+        -o-transition: border .20s;
+        transition: border .20s;
+      }
+      button.red:hover, 
+      .button.red:hover {
+        border: 1px solid #B0281A !important;
+        
+        background: #D14130;
+        background: -webkit-linear-gradient(top, #DC4A38, #C53727);
+        background: -moz-linear-gradient(top, #DC4A38, #C53727);
+        background: -ms-linear-gradient(top, #DC4A38, #C53727);
+        background: -o-linear-gradient(top, #DC4A38, #C53727);
+      }
+      button.blue, 
+      .button.blue {
+        border: 1px solid #092D6F !important;
+        
+        background: #D64937;
+        background: -webkit-linear-gradient(top, #1A4FB0, #092D6F);
+        background: -moz-linear-gradient(top, #1A4FB0, #092D6F);
+        background: -ms-linear-gradient(top, #1A4FB0, #092D6F);
+        background: -o-linear-gradient(top, #1A4FB0, #092D6F);
+        
+        -webkit-transition: border .20s;
+        -moz-transition: border .20s;
+        -o-transition: border .20s;
+        transition: border .20s;
+      }
+      button.green, 
+      .button.green {
+        border: 1px solid #183A06 !important;
+        
+        background: #D64937;
+        background: -webkit-linear-gradient(top, #2C6F09, #183A06);
+        background: -moz-linear-gradient(top, #2C6F09, #183A06);
+        background: -ms-linear-gradient(top, #2C6F09, #183A06);
+        background: -o-linear-gradient(top, #2C6F09, #183A06);
+        
+        -webkit-transition: border .20s;
+        -moz-transition: border .20s;
+        -o-transition: border .20s;
+        transition: border .20s;
+      }
+      button span.label, 
+      .button span.label {
+        display: inline-block;
+        float: left;
+        line-height: 17px;
+        height: 18px;
+        padding: 0 1px;
+        overflow: hidden;
+        color: #444;
+        
+        -webkit-transition: color .20s;
+        -moz-transition: color .20s;
+        -o-transition: color .20s;
+        transition: color .20s;
+      } 
+      button span.label {
+        line-height: 15px !important;
+      }
+      button.red .label, 
+      .button.red .label {
+        color: #FFF !important;
+        text-shadow: 0 1px 0 #B0281A !important;
+      }
+    </style>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+    <script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <script>
+      $(function() {
+        $( ".datepicker" ).datepicker();
+        $(".status").hide();
+      });
+      function makeReport(status){
+        if(status.indexOf('year') != -1){
+          google.script.run.yearlyReport();
+        }
+        else if(status.indexOf('month') != -1){
+          google.script.run.monthlyReport();
+        }
+        else if(status.indexOf('week') != -1){
+          google.script.run.weeklyReport();
+        }
+        else if(status.indexOf('day') != -1){
+          google.script.run.dailyReport();
+        }
+        else {
+          google.script.run.customReport($('.startDate').val(), $('.endDate').val());
+        }
+        document.getElementById(status).innerHTML = "I am making your report. It'll be sent to your mailbox soon."
+        $(".status").show('slow').delay(5000).fadeOut();
+      }
+      function trackMyActivities(status){
+        google.script.run.trackMyActivity();
+        document.getElementById(status).innerHTML = "I going to track your activities. No report or email will be sent.";
+        $(".status").show('slow').delay(5000).fadeOut();
+      }
+      function autoCloseActivities(status){
+        google.script.run.autoCloseActivities();
+        document.getElementById(status).innerHTML = "I going to check terminated activities and autoclose them.";
+        $(".status").show('slow').delay(5000).fadeOut();
+      }
+      function projectReportForManagement(){
+        google.script.run.projectReportForManagement();
+        document.getElementById('status-generate-mgmt-report').innerHTML = "Understood ! I am going to generate a report for the management. Check your email";
+        $(".status").show('slow').delay(5000).fadeOut();
+      }
+      function projectReportForSergio(){
+        google.script.run.projectReportForSergio();
+        document.getElementById('status-generate-personal-report').innerHTML = "Understood ! I am going to generate a report for you boss. Check your email";
+        $(".status").show('slow').delay(5000).fadeOut();
+      }
+    </script>
+  </head>
+  <body>
+    <div id="content">
+      <div id="innercontent">
+        <table>
+          <tr>
+            <td>
+              <!--<img src="http://s9.postimage.org/v2b73z7qn/visualization_intro.png"/>-->
+              <img src="https://www.iconfinder.com/icons/667366/download/png/64"/>
+            </td>
+            <td>
+              <h1>Activity tracker Stats <span style="color:red;font-size:11px;">Beta !</span></h1>
+            </td>
+          </tr>
+          <table>
+            <p>Get a comprehensive report every month with detailed statistics and analytics of how you work at <span style="border-collapse:collapse;color:rgb(102,102,102)">&nbsp;<span style="color:rgb(0,0,255)">E</span><span style="color:rgb(255,0,0)">ssi</span><span style="color:rgb(254,187,1)">l</span><span style="color:rgb(43,193,33)">or</span></span> Mail.</p>
+            <h2>Activity Intelligence for Everyone</h2>
+            <p>Hourly and weekly volume, top opened and closed tasks, projects volumetry, average response time... You can get all the data that you need to know about your activity.  </p>
+            <p>The tool will scan the following account : <b><?= account ?></b></p>
+            <p>The tool will pull data from this <b><a href="https://docs.google.com/spreadsheets/d/<?= SPREADSHEET_ID ?>" target="_blank">spreadsheet</a></b>.</p>
+            <div class="notifications-area">              
+              <div id="status-month" class="status" style="color:green;"></div>
+              <div id="status-week" class="status" style="color:green;"></div>
+              <div id="status-day" class="status" style="color:green;"></div>              
+              <div id="status-custom" class="status" style="color:green;"></div>
+              <div id="status-trackactivites" class="status" style="color:green;"></div>
+              <div id="status-closeactivites" class="status" style="color:green;"></div>
+              <div id="status-generate-mgmt-report" class="status" style="color:green;"></div>
+              <div id="status-generate-personal-report" class="status" style="color:green;"></div>
+            </div>
+            <div>
+             <table style="width:100%;margin-top:10px;margin-bottom:10px;">
+              <tr>
+                <td style="width:63%;vertical-align:top;padding:5px;">
+                  <h3>Standard reports</h3>
+                  <p style="color:grey;">Get a new report showing statistics for the previous month. The first report will be sent as soon as it is ready.</p>
+                  <button class="action red" onclick="makeReport('status-year');"><span class="label">Make yearly report</span></button>
+                  <button class="action red" onclick="makeReport('status-month');"><span class="label">Make monthly report</span></button>                  
+                  <button class="action red" onclick="makeReport('status-week');"><span class="label">Make weekly report</span></button>                  
+                  <button class="action red" onclick="makeReport('status-day');"><span class="label">Make daily report</span></button>
+                </td>
+                <td style="width:50%;vertical-align:top;padding:5px;">
+                  <h3>Custom report</h3>
+                  <p style="color:grey;">Get a report on a specific time range (a week, 2 months...)</p>
+                  <label for="startDate" style="width:50px;padding-top:2px;float:left;">Start </label><input style="float:left;" class="datepicker startDate" type="text" /><br/>
+                  <br/>
+                  <label for="startDate" style="width:50px;padding-top:2px;float:left;">End </label><input style="float:left;" class="datepicker endDate" type="text" /><br/>
+                  <br/>
+                  <div style="clear:both;"></div>
+                  <button class="action red" onclick="makeReport('status-custom');"><span class="label">Make custom report</span></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="width:63%;vertical-align:top;padding:5px;">
+                  <h3>Track activity task</h3>
+                  <p style="color:grey;">Ask me to go and crawl your inbox and pull the activities from there.</p>
+                  <button class="action blue" onclick="trackMyActivities('status-trackactivites');"><span class="label">Track my activity</span></button>
+                </td>
+                <td style="width:50%;vertical-align:top;padding:5px;">
+                  <h3>Auto close activities task</h3>
+                  <p style="color:grey;">Ask me to go and close all terminated activities.</p>
+                  <button class="action blue" onclick="autoCloseActivities('status-closeactivites');"><span class="label">Auto close activities</span></button>
+                </td>
+              </tr>
+              <tr>
+                <td style="width:63%;vertical-align:top;padding:5px;">
+                  <h3>Generate management report</h3>
+                  <p style="color:grey;">Generate a project report for the management.</p>
+                  <button class="action green" onclick="projectReportForManagement();"><span class="label">Generate management report</span></button>
+                </td>
+                <td style="width:50%;vertical-align:top;padding:5px;">
+                  <h3>Generate personal project report</h3>
+                  <p style="color:grey;">Generate a project report for myself (Sergio).</p>
+                  <button class="action green" onclick="projectReportForSergio();"><span class="label">Generate personal report</span></button>
+                </td>
+              </tr>
+            </table>
+          </div>
+          
+          <table style="font-family:'Times New Roman';border-spacing:0px 3px;width:100%;">
+            <tbody>
+              <tr style="border:0px">
+                <td style="background-color:rgb(0,109,180)"></td>
+                <td style="background-color:rgb(226,0,26)"></td>
+                <td style="background-color:rgb(251,186,0)"></td>
+                <td style="background-color:rgb(39,162,45)"></td>
+              </tr>
+            </tbody>
+          </table>
+       </table>
+       </div>
+       </div>
+    </div>
+  </body>
+</html>

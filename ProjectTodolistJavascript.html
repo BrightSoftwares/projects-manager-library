@@ -1,0 +1,513 @@
+<script type="application/javascript">
+        
+            function activateUiControls()
+            {
+                console.log("Activate UI controls (drag and drops, clicks, ...)");
+                $( ".portlet-list" ).sortable({
+                    connectWith: ".portlet-list",
+                    handle: ".portlet-header",
+                    cancel: ".portlet-toggle",
+                    start: function (event, ui) {
+                        ui.item.addClass('tilt');
+                    },
+                    stop: function (event, ui) {
+                        ui.item.removeClass('tilt');
+                        updateTaskNumbersDebounced();
+                        updateSpreadsheetDebounced();
+                    }
+                });
+          
+                $( ".portlet" )
+                .addClass( "ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" )
+                .find( ".portlet-header" )
+                .addClass( "ui-widget-header ui-corner-all" )
+                .prepend( "<span class='ui-icon ui-icon-minusthick portlet-toggle'></span>");
+                
+                //$( ".portlet" ).hover(function () { $(this).find( ".portlet-bottom" ).fadeIn({ duration: 20, queue: false }); }, function () { $(this).find( ".portlet-bottom" ).fadeOut({ duration: 20, queue: false }); } );
+          
+                $( ".portlet-toggle" ).click(function() {
+                  var icon = $( this );
+                  icon.toggleClass( "ui-icon-minusthick ui-icon-plusthick" );
+                  icon.closest( ".portlet" ).find( ".portlet-content" ).toggle();
+                }); 
+                
+                $( ".portlet" ).click(function(){
+                  // fill the form to make it read for edit
+                  console.log("Fill the form to make it read for edit");
+                  var item = $( this );
+                  var taskId = item.find( ".portlet-taskid" ).text().toString().trim();
+                  var projectname = item.find( ".portlet-projectname" ).text().toString().trim();
+                  var status = item.find( ".portlet-status" ).text().toString().trim();
+                  var category = item.find( ".portlet-category" ).text().toString().trim();
+                  var description = item.find( ".portlet-description" ).text().toString().trim();
+                  var duedate = item.find( ".portlet-taskduedate" ).text().toString().trim();
+                  var duration = item.find( ".portlet-taskduration" ).text().toString().trim();
+                  console.log("Task id = " + taskId + ", description: " + description + ", category: " + category + ", status: " + status + ", project name: " + projectname + ", duration: " + duration);
+                  
+                  //var duedatestr = 
+                  // Update the form
+                  var form = $("#add-task-form");            
+                  $("#add-task-projectname").val(projectname);
+                  $("#add-task-taskdescription").val(description);
+                  $("#add-task-taskid").val(taskId);
+                  $("#add-task-taskstatus").val(status);
+                  $("#add-task-taskcategory").val(category);
+                  $("#add-task-taskduedate").val(duedate);
+                  $("#add-task-taskduration").val(duration);
+                  $(".add-task-button").addClass("btn-warning").removeClass("btn-primary").text("Update task");
+                });
+                
+                $( ".portlet-review-marktodo" ).click(function() {
+                  console.log("Mark an item as todo started");
+                  var item = $( this ).closest(".portlet");
+                  updateProjectActionStatus(item, "To do");
+                });
+          
+                $( ".portlet-review-markinprogress" ).click(function() {
+                  console.log("Mark an item as inprogress started");
+                  var item = $( this ).closest(".portlet");
+                  updateProjectActionStatus(item, "In progress");
+                });
+                
+                $( ".portlet-review-markdone" ).click(function() {
+                  console.log("Mark a status of the item as done started");
+                  var item = $( this ).closest(".portlet");
+                  updateProjectActionStatus(item, "Done");
+                });
+                
+                $( ".portlet-markdone" ).click(function() {
+                  console.log("Mark an item as done started");
+                  var item = $( this ).closest(".portlet");                  
+                  updateProjectActionStatus(item, "Done");
+                });
+          
+                $( ".portlet-markabandoned, .portlet-review-markabandoned" ).click(function() {
+                  console.log("Mark an item as abandonned started");
+                  var item = $( this ).closest(".portlet");
+                  updateProjectActionStatus(item, "Abandonned");
+                }); 
+                
+                //********  CATEGORY  *******//
+                $( ".portlet-review-markurgentandimportant" ).click(function() {
+                  console.log("Mark an item category started");
+                  var item = $( this ).closest(".portlet");                  
+                  updateProjectActionCategory(item, "urgent_important");
+                });
+                
+                $( ".portlet-review-markurgentnotimportant" ).click(function() {
+                  console.log("Mark an item category started");
+                  var item = $( this ).closest(".portlet");                  
+                  updateProjectActionCategory(item, "urgent_notimportant");
+                });
+                
+                $( ".portlet-review-marknoturgentimportant" ).click(function() {
+                  console.log("Mark an item category started");
+                  var item = $( this ).closest(".portlet");                  
+                  updateProjectActionCategory(item, "noturgent_important");
+                });
+                
+                $( ".portlet-review-marknoturgentnotimportant" ).click(function() {
+                  console.log("Mark an item category started");
+                  var item = $( this ).closest(".portlet");                  
+                  updateProjectActionCategory(item, "noturgent_notimportant");
+                });
+          
+            
+                console.log("Controls activated.");
+          }
+          
+          function updateProjectActionStatus(item, status) 
+          {
+            console.log("Mark an item status as " + status + " started");
+            console.log("Portlet object : " + item);
+            var taskId = item.find( ".portlet-taskid" ).text().toString().trim();
+            var description = item.find( ".portlet-description" ).text();
+            console.log("Task id = " + taskId + ", description: " + description);
+            
+            $( this ).closest(".portlet").find( ".loader-holder" ).addClass("loader");
+            
+            google.script.run
+            .withUserObject(item)
+            .withSuccessHandler(function() 
+            { 
+              console.log("Success"); 
+              item.closest(".portlet").addClass("done"); 
+              item.closest(".portlet").find( ".loader-holder" ).removeClass("loader"); 
+              item.closest(".portlet-review").fadeOut({ duration: 100, queue: false }); 
+            })
+            .withFailureHandler(function() 
+            { 
+              console.log("Failed to set action status");
+            })
+            .markProjectActionStatusAs(taskId, status);
+          }
+          
+          function updateProjectActionCategory(item, category) 
+          {
+            console.log("Mark an item category as "+ category +" started");
+            console.log("Portlet object : " + item);
+            var taskId = item.find( ".portlet-taskid" ).text().toString().trim();
+            var description = item.find( ".portlet-description" ).text();
+            console.log("Task id = " + taskId + ", description: " + description);
+            
+            $( this ).closest(".portlet").find( ".loader-holder" ).addClass("loader");
+            
+            google.script.run
+            .withUserObject(item)
+            .withSuccessHandler(function() 
+            { 
+              console.log("Success"); 
+              item.closest(".portlet").addClass("done"); 
+              item.closest(".portlet").find( ".loader-holder" ).removeClass("loader"); 
+              //item.closest(".portlet-review").fadeOut({ duration: 100, queue: false });
+              item.closest(".portlet").find(".portlet-tag-category").text(category);
+            })
+            .withFailureHandler(function() 
+            { 
+              console.log("Failed to set category status");
+            })
+            .markProjectActionCategoryAs(taskId, category);
+          }
+          
+          function addProjectTask()
+          {
+            console.log("Starting add project task ...");
+            $(".add-task-button .glyphicon").addClass("glyphicon-refresh");
+            
+            var item = $("#add-task-form");
+            
+            item.find(".status" ).text("Processing").fadeIn();
+            
+            var projectname = $("#add-task-projectname").val();
+            var taskid = $("#add-task-taskid").val();
+            var taskdescription = $("#add-task-taskdescription").val();
+            var taskstatus = $("#add-task-taskstatus").val();
+            var taskcategory = $("#add-task-taskcategory").val();
+            var taskduedate = $("#add-task-taskduedate").val();
+            var taskduration = $("#add-task-taskduration").val();
+            
+            console.log("Data to add : projectname = " + projectname 
+            + ", taskdescription = " + taskdescription + ", taskstatus = " 
+            + taskstatus + ", taskcategory = " + taskcategory + ", taskduedate = " + taskduedate + ", taskduration = " + taskduration);
+            
+            //updateProjectAction(projectname, taskdescription, taskstatus, taskcategory)
+            google.script.run
+              .withUserObject(item)
+              .withSuccessHandler(function() { 
+                   item.find( ".status" ).text("Done");
+                   console.log("Task added successfully."); clearTaskAddForm(); 
+              } )
+              .withFailureHandler(function(error) { 
+                   item.find( ".status" ).text("Failed"); 
+                   console.log("Task add failed ! Message : " + error.message); 
+              } )
+              .updateProjectAction(taskid, projectname, taskdescription, taskstatus, taskcategory, taskduedate, taskduration);
+              
+            item.find(".status" ).fadeOut(10000);
+          }
+          
+          function clearTaskAddForm()
+          {
+            $("#add-task-form").find( "input" ).val('');
+            $(".add-task-button").addClass("btn-primary").removeClass("btn-warning").text("Add task");
+          }
+          
+          function displayProjectTasks(projectTasks)
+          {
+            console.log("Displaying project tasks ...");
+            $(".add-task-container:first-child .glyphicon").addClass("glyphicon-refresh");
+            
+            var urgent_important = $('#urgent_important .portlet-list');
+            var noturgent_important = $('#noturgent_important .portlet-list');
+            var urgent_notimportant = $('#urgent_notimportant .portlet-list');
+            var noturgent_notimportant = $('#noturgent_notimportant .portlet-list');
+            var done = $('#done .portlet-list');
+            var projectname_selector = $('#add-task-projectname');
+            
+            urgent_important.empty();
+            noturgent_important.empty();
+            urgent_notimportant.empty();
+            noturgent_notimportant.empty();
+            done.empty();
+            projectname_selector.empty();
+            
+            var portletCode = "";
+            var select_option_items = [];
+            
+            for (var i = 0; i < projectTasks.length; i++) 
+            {
+              console.log(projectTasks[i].project_name);
+              var projectName = projectTasks[i].project_name.toString().trim();
+              console.log("AI JSON is : " + projectTasks[i].aijson);
+              var airesult = projectTasks[i].aijson != "" ? JSON.parse(projectTasks[i].aijson) : {};
+              console.log("Entities result : " + airesult.entities);
+              var aiintent = airesult.entities != undefined && airesult.entities.intent != undefined ? airesult.entities.intent[0].value : "standard intent";
+              var aiaction = airesult.entities != undefined && airesult.entities.action != undefined ? airesult.entities.action[0].value : "standard action"
+              console.log("Intent result : " + aiintent);
+              portletCode = '<div class="portlet">\
+                                <div class="portlet-header">\
+                                  <div class="portlet-projectname">' + projectName + '</div>\
+                                  <span class="glyphicon glyphicon-calendar"></span> <span class="portlet-taskduedate">' + projectTasks[i].task_duedate + '</span>\
+                                  <span class="glyphicon glyphicon-time"></span> <span class="portlet-taskduration">' + projectTasks[i].task_duration + '</span>\
+                                  <span class="portlet-taskpredecessors"><span class="glyphicon glyphicon-list-alt"> </span>' + projectTasks[i].task_predecessors + '</span>\
+                                  <div class="loader-holder"></div>\
+                                  <span class="portlet-toggle">&#x2796;</span>\
+                                  <span class="portlet-markdone">&#x2714;</span>\
+                                  <span class="portlet-markabandoned">&#x2639;</span>\
+                                </div>\
+                                <div class="portlet-taskid tag">' + projectTasks[i].task_id + '</div>\
+                                <div class="portlet-category">' + projectTasks[i].category + '</div>\
+                                <div class="portlet-content">\
+                                  <span class="portlet-tasknumber tag tag-taskid tag-pill tag-default">' +  projectTasks[i].task_number  + '</span>\
+                                  <span class="portlet-status">[' +  projectTasks[i].status  + ']</span>\
+                                  <span class="portlet-description"> ' +  projectTasks[i].task_description  + '</span>\
+                                  <span class="portlet-aijson tag tag-pill tag-intent-'+ aiintent +'">' +  aiintent  + '</span>\
+                                  <span class="portlet-aijson tag tag-pill tag-action-'+ aiaction +'">' +  aiaction  + '</span>\
+                                </div>\
+                             </div>';
+              if(projectTasks[i].status == "done" || 
+                 projectTasks[i].status == "Done" || 
+                 projectTasks[i].status == "abandoned" || 
+                 projectTasks[i].status == "abandonned" || 
+                 projectTasks[i].status == "Abandonned" || 
+                 projectTasks[i].status == "Abandoned" || 
+                 projectTasks[i].category == "done" || 
+                 projectTasks[i].category == "Done"|| 
+                 projectTasks[i].category == "abandonned" ||
+                 projectTasks[i].category == "Abandonned" || 
+                 projectTasks[i].category == "abandoned" || 
+                 projectTasks[i].category == "Abandonned")
+              {
+                 done.append(portletCode);
+              }              
+              else if(projectTasks[i].category == "urgent_important") { urgent_important.append(portletCode); }
+              else if(projectTasks[i].category == "noturgent_important") { noturgent_important.append(portletCode); }              
+              else if(projectTasks[i].category == "urgent_notimportant") { urgent_notimportant.append(portletCode); }              
+              else if(projectTasks[i].category == "noturgent_notimportant") { noturgent_notimportant.append(portletCode); }
+              
+              if (select_option_items.indexOf(projectName) == -1) 
+              { 
+                select_option_items.push(projectName);
+                projectname_selector.append($('<option>', { value: projectName, text: projectName })); 
+              }
+              
+              $(".add-task-button .glyphicon, .add-task-container .glyphicon").removeClass("glyphicon-refresh");
+            }
+            
+            /*** Activate editable select ***/
+            $("#add-task-projectname").editableSelect();
+            console.log("Finished.");
+            
+            activateUiControls();
+          }
+          
+          function updateTaskNumbers()
+          {          
+            updateTaskDuedates();
+            
+            console.log("Updating task numbers ...");
+            var index = 1;
+            $(".column .portlet-tasknumber").each(function(index){ $(this).text(index); });
+            console.log("Done.");
+          };
+          
+          function updateTaskDuedates()
+          {
+            console.log("Updating task duedates ...");
+            var index = 1;
+            var predecessordate = new Date().getTime();
+            
+            //$(".column .portlet-task_duedate").each(function(index)
+            //{ 
+            //  $(this).text(index); 
+            //});
+            
+            $(".column .portlet").each(function()
+            { 
+              var item = $( this );
+              var prev = item.prev();
+              //console.log(prev); console.log(prev.html());
+              var prevDateStr = prev.find( ".portlet-taskduedate").text();
+              var taskDuration = parseInt(item.find( ".portlet-taskduration").text());
+              var taskDurationMilisec = taskDuration*24*60*60*1000;
+              
+              if(prev.html() == undefined) 
+              { 
+                console.log("!!! No previous date. Generate a new date.");
+                var prevDateForNewdate = item.find( ".portlet-taskduedate").text();
+                var predecessorDateForNewdate = item.find( ".portlet-taskduedate").text();
+                
+                console.log("Previous date for new date : " + prevDateForNewdate + ", predecessor date for new date : " + predecessorDateForNewdate);
+                var prevDate = new Date(prevDateForNewdate); 
+                var predecessordate = new Date(predecessorDateForNewdate);
+                
+                if(isNaN(prevDate.getTime())) { console.log("Generating new preDate"); prevDate = new Date(); }
+                if(isNaN(predecessordate.getTime())) { console.log("Generating new predecessordate"); predecessordate = new Date(); }
+                
+                var taskNewDueDate = predecessordate.getTime(); //prevDate.getTime() + taskDurationMilisec;
+              } 
+              else 
+              { 
+                var prevDate = new Date(prevDateStr); 
+                var predecessordate = new Date(prevDateStr); 
+                var taskNewDueDate = predecessordate.getTime() + taskDurationMilisec; //prevDate.getTime() + taskDurationMilisec;
+              }
+              
+              console.log("Updating tash due date for duration " + taskDurationMilisec + " Prev Date sting : " + prevDateStr + " . New due date : " + taskNewDueDate);
+              taskNewDueDate = new Date(taskNewDueDate);
+              var taskNewDueDate_month = ("0" + (taskNewDueDate.getMonth()+1)).slice(-2);
+              var taskNewDueDate_date = ("0" + (taskNewDueDate.getDate())).slice(-2);
+              var taskNewDueDateStr = taskNewDueDate.getFullYear() + '-' + taskNewDueDate_month + '-' + taskNewDueDate_date;
+              var taskDuedate = item.find( ".portlet-taskduedate").text(taskNewDueDateStr);
+              predecessordate = taskNewDueDate;
+            });
+            
+            console.log("Done.");
+          };
+          
+          function updateSpreadsheet()
+          {
+            console.log("Updating spreadsheet with new numbers ...");
+            $(".add-task-container .glyphicon").addClass("glyphicon-refresh");
+            
+            var tasksJson = convertTasksToJson();
+            
+            $( ".add-task-button-loader" ).toggleClass("loader");
+            
+            google.script.run
+              .withSuccessHandler(function(bachResult) 
+                { 
+                  console.log("Success updating spreadsheet ! Batch result : " + bachResult); 
+                  $( ".add-task-button-loader" ).toggleClass("loader");
+                  $( "#show-lastpushedtospreadsheet-ref" ).text("");
+                  updateRelativeLastpushedtospreadsheet();
+                  refreshProjectTasks();
+                  
+                } )
+              .withFailureHandler(function(error) 
+                { 
+                  console.log("Failure : " + error.message); 
+                  $( ".add-task-button-loader" ).toggleClass("loader"); 
+                } )
+              .batchUpdateProjectactionTasknumber(tasksJson);
+            
+            
+            /*$(".column .portlet").each(function(){ 
+              var item = $( this );
+              var taskId = item.find( ".portlet-taskid" ).text();
+              var taskNumber = item.find( ".portlet-tasknumber" ).text();
+              var taskCategory = item.parent().parent().attr('id');
+              
+              item.find( ".loader-holder" ).addClass("loader");
+              
+              google.script.run
+              .withUserObject(item)
+              .withSuccessHandler(function() { console.log("Success"); item.find( ".loader-holder" ).removeClass("loader");  } )
+              .withFailureHandler(function() { console.log("Failure"); item.find( ".portlet-markdone" ).toggleClass("blink"); } )
+              .updateProjectactionTasknumber(taskId, taskCategory, taskNumber);
+            });
+            */
+            
+          };
+          
+          function convertTasksToJson()
+          {
+            var tasksData = {};
+            $(".column .portlet").each(function(){ 
+              var item = $( this );
+              var taskId = item.find( ".portlet-taskid" ).text();
+              var taskNumber = item.find( ".portlet-tasknumber" ).text();
+              var taskDuedate = item.find( ".portlet-taskduedate" ).text();
+              var taskDuration = item.find( ".portlet-taskduration" ).text();
+              var taskCategory = item.parent().parent().attr('id');
+              
+              tasksData[taskId] = { 
+                taskId: taskId, 
+                taskCategory: taskCategory, 
+                taskNumber: taskNumber,
+                taskDuedate: taskDuedate,
+                taskDuration: taskDuration
+              };
+            });
+            
+            var tasksJson = JSON.stringify(tasksData);
+            //console.log(tasksJson);
+            
+            return tasksJson;
+          }
+          
+          function debounce(callback, delay){
+            console.log("Debouncing ...");
+            var timer;
+            
+            return function(){
+              var args = arguments;
+              var context = this;
+              clearTimeout(timer);
+              timer = setTimeout(function(){
+                callback.apply(context, args);
+                }, delay)
+            }
+          };
+          
+          function refreshProjectTasks() 
+          { 
+            console.log("Refreshing project tasks ..."); 
+            $(".add-task-button .glyphicon").addClass("glyphicon-refresh");
+            google.script.run.withSuccessHandler(displayProjectTasks).retrieveProjectTasks();
+          };
+          
+          function updateRelativeLastpushedtospreadsheet()
+          {
+            
+            var refreshDate = new Date();
+            var refreshDateString = $( "#show-lastpushedtospreadsheet-ref" ).text();
+            
+            //alert("Hello");
+            if ( refreshDateString != "") 
+            { 
+              refreshDate = new Date(refreshDateString); 
+            } 
+            else 
+            { 
+              $( "#show-lastpushedtospreadsheet-ref" ).text(refreshDate); 
+            }
+            
+            $( "#show-lastpushedtospreadsheet" ).text('Last pushed to spreadsheet : ' + relativeDate(refreshDate)); 
+          };
+          
+          function relativeDate(dateStr)
+          {
+            //console.log("Calculate relative date for " + dateStr);
+            var date = new Date(Date.parse(dateStr));
+            //console.log("Date parsed. " + date);
+            
+            // Make a fuzzy time
+            var delta = Math.round((+new Date - date) / 1000);
+          
+            var minute = 60,
+            hour = minute * 60,
+            day = hour * 24,
+            week = day * 7;
+          
+            var fuzzy = "unknown date";
+          
+            if (delta < 30){ fuzzy = 'just then.'; } 
+            else if (delta < minute) { fuzzy = delta + ' seconds ago.'; } 
+            else if (delta < 2 * minute) { fuzzy = 'a minute ago.' }
+            else if (delta < hour) { fuzzy = Math.floor(delta / minute) + ' minutes ago.'; } 
+            else if (Math.floor(delta / hour) == 1) { fuzzy = '1 hour ago.' } 
+            else if (delta < day) { fuzzy = Math.floor(delta / hour) + ' hours ago.'; } 
+            else if (delta < day * 2) { fuzzy = 'yesterday'; }
+            else { fuzzy = Math.floor(delta / day) + ' days'; }
+            return fuzzy;
+          }
+          
+          var updateTaskNumbersDebounced = debounce(updateTaskNumbers, 3000); //updateSpreadsheetDebounced
+          var refreshProjectTasksDebounced = debounce(refreshProjectTasks, 3000); //refreshProjectTasks
+          var updateSpreadsheetDebounced = debounce(updateSpreadsheet, 31000); // 5 minutes before updating into the spreadsheet
+          setInterval(function(){ updateRelativeLastpushedtospreadsheet(); }, 30000); // update the last refreshed relative time every 5 min
+          
+          // load the project tasks
+          refreshProjectTasks();
+</script>

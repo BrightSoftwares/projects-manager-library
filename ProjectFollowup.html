@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <?!= include('ProjectTodolistCSS'); ?>
+  </head>
+  <body>
+  
+  
+  
+    <div class="add-task-container">
+    <button type="button" class="btn btn-primary mb-2 mr-sm-2 mb-sm-0" onclick="refreshProjectTasks()">
+      <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+      Update project task list
+    </button>
+    <button type="button" class="btn btn-warning mb-2 mr-sm-2 mb-sm-0" onclick="updateSpreadsheet()">
+      Push updates to spreadsheet
+      <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+      <span class="add-task-button-loader"></span>
+    </button>
+    <span id="show-lastpushedtospreadsheet-ref" style="display:none;"></span>
+    <span id="show-lastpushedtospreadsheet"></span>
+  
+    <form id="add-task-form" class="form-inline">
+      <div class="form-group add-task-form-item">
+        <label for="projectname" class="sr-only">Project name </label>
+        <select class="project-name custom-select mb-2 mr-sm-2 mb-sm-0" id="add-task-projectname">
+          <option selected>Loading ...</option>
+        </select>
+      </div>
+      
+      <div class="add-task-form-item form-group mb-2 mr-sm-2 mb-sm-0">
+        <label for="taskdescription" class="sr-only">Task description </label>
+        <input class="task-description form-control" type="text" id="add-task-taskdescription" placeholder="Task description" />
+      </div>
+      
+      <div class="add-task-form-item form-group mb-2 mr-sm-2 mb-sm-0">
+        <label for="taskid" class="sr-only">Task id </label>
+        <input class="task-id form-control" type="text" id="add-task-taskid" placeholder="Task id" />
+      </div>
+      
+      <div class="form-group add-task-form-item">
+        <label for="taskstatus" class="sr-only">Task status </label>
+        <select class="task-status custom-select mb-2 mr-sm-2 mb-sm-0" id="add-task-taskstatus">
+          <option value="To do" selected>To do</option>
+          <option value="In progress">In progress</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+      
+      <div class="form-group add-task-form-item">
+        <label for="taskcategory" class="sr-only">Task Category </label>
+        <select class="task-category custom-select mb-2 mr-sm-2 mb-sm-0" id="add-task-taskcategory">
+          <option value="urgent_important" selected>Urgent Important</option>
+          <option value="noturgent_important">Not urgent important</option>
+          <option value="urgent_notimportant">Urgent Not important</option>
+          <option value="noturgent_notimportant">Not urgent Not important</option>
+        </select>
+      </div>
+            
+      <div class="add-task-form-item form-group mb-2 mr-sm-2 mb-sm-0">
+        <label for="taskduedate" class="sr-only">Task due date </label>
+        <input class="task-duedate form-control" type="date" id="add-task-taskduedate" value="2017-08-03" name="duedate">
+      </div>      
+      
+      <button type="button" class="add-task-button btn btn-primary mb-2 mr-sm-2 mb-sm-0" onclick="addProjectTask()">
+        <span class="glyphicon glyphicon-refresh-animate"></span>Add task
+      </button>
+      <button type="button" class="clear-task-button btn btn-default mb-2 mr-sm-2 mb-sm-0" onclick="clearTaskAddForm()">Clear</button>
+      <span class="status" style="display:none;"></span>
+    </form>
+    </div>
+    
+    <div class="add-task-container-marge"></div>
+    
+    <div class="column" id="urgent_important">
+      <div class="column-category">Urgent <strong>and</strong> important <br/><i>To do in priority</i></div>
+ 
+      <div class="portlet-list">
+        Loading ... 
+      </div>
+    </div>
+ 
+    <div class="column" id="noturgent_important">      
+      <div class="column-category"><strong>Non </strong>Urgent but important <br/><i>To schedule</i></div>
+      
+      <div class="portlet-list">
+        Loading ...
+      </div>
+    </div>
+ 
+    <div class="column" id="urgent_notimportant">
+      <div class="column-category">Urgent <strong>but not</strong> important <br/><i>To delegate</i></div>
+      
+      <div class="portlet-list">
+        Loading ... 
+      </div>
+    </div>
+    
+    <div class="column" id="noturgent_notimportant">
+      <div class="column-category"><strong>Non</strong> Urgent and <strong>not</strong> important <br/><i>To throw away</i></div>
+      
+      <div class="portlet-list">
+        Loading ... 
+      </div>
+    </div>
+    
+    <div class="column-done" id="done">
+      <div class="column-category">Done <br/><i>Yeh ! Not to be done anymore</i></div>
+      
+      <div class="portlet-list">
+        Loading ...
+      </div>
+    </div>
+ 
+  
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script scr="//cdnjs.cloudflare.com/ajax/libs/mixitup/2.1.11/jquery.mixitup.min.js"></script>
+    <script src="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.js"></script>
+    <link href="//rawgithub.com/indrimuska/jquery-editable-select/master/dist/jquery-editable-select.min.css" rel="stylesheet">
+    <?!= include('ProjectTodolistJavascript'); ?>
+  </body>
+</html>
