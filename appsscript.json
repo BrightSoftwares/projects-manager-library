@@ -1,0 +1,11 @@
+{
+  "timeZone": "Europe/Paris",
+  "dependencies": {
+    "libraries": [{
+      "userSymbol": "SpreadsheetDb",
+      "libraryId": "17okAlFqAE2H68loc2H8aB1OZnTdlmLfXxj_oFN9Q8I_YvrCKyPWR818v",
+      "version": "2"
+    }]
+  },
+  "exceptionLogging": "STACKDRIVER"
+}
